@@ -4,8 +4,15 @@ on:
   push:
     branches:
       - main
+      - dev
     paths:
       - 'ClientAdvisor/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'ClientAdvisor/**'
+  workflow_dispatch:
   # schedule:
   #   - cron: '0 6,18 * * *'  # Runs at 6:00 AM and 6:00 PM GMT
 
