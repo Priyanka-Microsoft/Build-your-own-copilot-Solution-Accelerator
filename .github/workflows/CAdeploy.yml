@@ -191,7 +191,7 @@ jobs:
 
                 echo "Running post-deployment script..."
                 bash ./infra/scripts/add_cosmosdb_access.sh \
-                  "${{ env.RG_NAME }}" \
+                  "${{ env.RESOURCE_GROUP_NAME }}" \
                   "${{ env.COSMOS_DB_ACCOUNT_NAME }}" \
                   "${{ secrets.AZURE_CLIENT_ID }}"
 
