@@ -189,51 +189,43 @@ jobs:
                 echo "RG_NAME=$RG_NAME" >> $GITHUB_ENV
                 echo "CLIENT_OBJECT_ID=$CLIENT_OBJECT_ID" >> $GITHUB_ENV
 
-                # Fixed Cosmos DB role assignment - using correct variable names
-                az cosmosdb sql role assignment create \
-                  --account-name "$COSMOS_DB_ACCOUNT_NAME" \
-                  --resource-group "$RG_NAME" \
-                  --role-definition-name "Cosmos DB Built-in Data Contributor" \
-                  --scope "/" \
-                  --principal-id "$CLIENT_OBJECT_ID"
+                echo "Running post-deployment script..."
+                bash ./infra/scripts/add_cosmosdb_access.sh \
+                  "${{ env.RG_NAME }}" \
+                  "${{ env.COSMOS_DB_ACCOUNT_NAME }}" \
+                  "${{ secrets.AZURE_CLIENT_ID }}"
 
-                # Fixed Storage role assignment - need to construct the storage resource ID
-                STORAGE_RESOURCE_ID="/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/$RG_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT"
-                
-                echo "Assigning Storage Blob Data Contributor role to managed identity... ${CLIENT_OBJECT_ID} for storage account $STORAGE_ACCOUNT"
-                az role assignment create \
-                  --assignee "$CLIENT_OBJECT_ID" \
-                  --role "Storage Blob Data Contributor" \
-                  --scope "$STORAGE_RESOURCE_ID"
+                bash ./infra/scripts/copy_kb_files.sh \
+                  "${{ env.STORAGE_ACCOUNT_NAME }}" \
+                  "${{ env.STORAGE_CONTAINER_NAME }}" \
+                  "" \
+                  "${{ secrets.AZURE_CLIENT_ID }}"
 
-                echo "=== Running Post-Deployment Script ==="
-                echo "Importing sample data into the deployed resources..."
+                bash ./infra/scripts/run_create_index_scripts.sh \
+                  "${{ env.KEY_VAULT_NAME }}" \
+                  "" \
+                  "${{ secrets.AZURE_CLIENT_ID }}" \
+                  "${{ env.RG_NAME }}" \
+                  "${{ env.SQL_SERVER }}" \
+                  
 
-                chmod +x ./infra/scripts/process_sample_data.sh
+                user_roles_json='[
+                  {
+                    "clientId": "'"${{ secrets.AZURE_CLIENT_ID }}"'",
+                    "displayName": "webapp-identity",
+                    "role": "db_datareader"
+                  },
+                  {
+                    "clientId": "'"${{ secrets.AZURE_CLIENT_ID }}"'",
+                    "displayName": "webapp-identity",
+                    "role": "db_datawriter"
+                  }
+                ]'
 
-                echo "Executing command:"
-                echo "bash ./infra/scripts/process_sample_data.sh \\"
-                echo "  \"$RG_NAME\" \\"
-                echo "  \"$COSMOS_DB_ACCOUNT_NAME\" \\"
-                echo "  \"$STORAGE_ACCOUNT\" \\"
-                echo "  \"$STORAGE_CONTAINER\" \\"
-                echo "  \"$KEYVAULT_NAME\" \\"
-                echo "  \"$SQL_SERVER\" \\"
-                echo "  \"$SQL_DATABASE\" \\"
-                echo "  \"$CLIENT_OBJECT_ID\" \\"
-                echo "  \"$CLIENT_NAME\""
-                echo ""
-
-                bash ./infra/scripts/process_sample_data.sh \
-                  "$RG_NAME" \
-                  "$COSMOS_DB_ACCOUNT_NAME" \
-                  "$STORAGE_ACCOUNT" \
-                  "$STORAGE_CONTAINER" \
-                  "$KEYVAULT_NAME" \
-                  "$SQL_SERVER" \
-                  "$SQL_DATABASE" \
-                  "$CLIENT_OBJECT_ID" \
-                  "$CLIENT_NAME"
+                bash ./infra/scripts/add_user_scripts/create_sql_user_and_role.sh \
+                  "${{ env.SQL_SERVER }}.database.windows.net" \
+                  "${{ env.SQL_DATABASE_NAME }}" \
+                  "$user_roles_json"
 
                 echo "=== Post-Deployment Script Completed Successfully ==="
       - name: Get App URLs
