@@ -189,25 +189,38 @@ jobs:
                 echo "RG_NAME=$RG_NAME" >> $GITHUB_ENV
                 echo "CLIENT_OBJECT_ID=$CLIENT_OBJECT_ID" >> $GITHUB_ENV
 
+                echo "Executing command:"
+                echo "  \"$RG_NAME\" \\"
+                echo "  \"$COSMOS_DB_ACCOUNT_NAME\" \\"
+                echo "  \"$STORAGE_ACCOUNT\" \\"
+                echo "  \"$STORAGE_CONTAINER\" \\"
+                echo "  \"$KEYVAULT_NAME\" \\"
+                echo "  \"$SQL_SERVER\" \\"
+                echo "  \"$SQL_DATABASE\" \\"
+                echo "  \"$CLIENT_OBJECT_ID\" \\"
+                echo "  \"$CLIENT_NAME\""
+                echo ""
+
                 echo "Running post-deployment script..."
+                echo "Running post-deployment script..."
+
                 bash ./infra/scripts/add_cosmosdb_access.sh \
-                  "${{ env.RESOURCE_GROUP_NAME }}" \
-                  "${{ env.COSMOS_DB_ACCOUNT_NAME }}" \
-                  "${{ secrets.AZURE_CLIENT_ID }}"
+                  "$RG_NAME" \
+                  "$COSMOS_DB_ACCOUNT_NAME" \
+                  "${{ secrets.AZURE_CLIENT_ID }}" 
 
                 bash ./infra/scripts/copy_kb_files.sh \
-                  "${{ env.STORAGE_ACCOUNT_NAME }}" \
-                  "${{ env.STORAGE_CONTAINER_NAME }}" \
+                  "$STORAGE_ACCOUNT_NAME" \
+                  "$STORAGE_CONTAINER_NAME" \
                   "" \
                   "${{ secrets.AZURE_CLIENT_ID }}"
 
                 bash ./infra/scripts/run_create_index_scripts.sh \
-                  "${{ env.KEY_VAULT_NAME }}" \
+                  "$KEY_VAULT_NAME" \
                   "" \
                   "${{ secrets.AZURE_CLIENT_ID }}" \
-                  "${{ env.RG_NAME }}" \
-                  "${{ env.SQL_SERVER }}" \
-                  
+                  "$RG_NAME" \
+                  "$SQL_SERVER_NAME"
 
                 user_roles_json='[
                   {
@@ -223,8 +236,8 @@ jobs:
                 ]'
 
                 bash ./infra/scripts/add_user_scripts/create_sql_user_and_role.sh \
-                  "${{ env.SQL_SERVER }}.database.windows.net" \
-                  "${{ env.SQL_DATABASE_NAME }}" \
+                  "$SQL_SERVER_NAME.database.windows.net" \
+                  "$SQL_DATABASE_NAME" \
                   "$user_roles_json"
 
                 echo "=== Post-Deployment Script Completed Successfully ==="
