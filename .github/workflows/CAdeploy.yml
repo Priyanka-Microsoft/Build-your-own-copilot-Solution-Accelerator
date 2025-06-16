@@ -166,10 +166,6 @@ jobs:
 
                 az account set --subscription "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
 
-                SP_OBJECT_ID=$(az ad sp show --id "$AZURE_CLIENT_ID" --query objectId -o tsv)
-                export AZURE_OBJECT_ID="$SP_OBJECT_ID"
-                echo "Azure Object ID: $AZURE_OBJECT_ID"
-
                 # ✅ Resolve Managed Identity Object ID
                 export CLIENT_OBJECT_ID=$(az identity show \
                   --name "$CLIENT_NAME" \
@@ -204,6 +200,7 @@ jobs:
                 # Fixed Storage role assignment - need to construct the storage resource ID
                 STORAGE_RESOURCE_ID="/subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/$RG_NAME/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT"
                 
+                echo "Assigning Storage Blob Data Contributor role to managed identity... ${CLIENT_OBJECT_ID} for storage account $STORAGE_ACCOUNT"
                 az role assignment create \
                   --assignee "$CLIENT_OBJECT_ID" \
                   --role "Storage Blob Data Contributor" \
