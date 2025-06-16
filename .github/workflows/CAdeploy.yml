@@ -166,6 +166,10 @@ jobs:
 
                 az account set --subscription "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
 
+                SP_OBJECT_ID=$(az ad sp show --id "$AZURE_CLIENT_ID" --query objectId -o tsv)
+                export CLIENT_OBJECT_ID="$SP_OBJECT_ID"
+                echo "Azure Object ID: $CLIENT_OBJECT_ID"
+
                 # ✅ Resolve Managed Identity Object ID
                 export CLIENT_OBJECT_ID=$(az identity show \
                   --name "$CLIENT_NAME" \
