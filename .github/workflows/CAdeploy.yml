@@ -200,15 +200,6 @@ jobs:
             "${{ secrets.AZURE_CLIENT_ID }}"
           
           echo "=== Post-Deployment Script Completed Successfully ==="
-          
-      - name: Get App URLs
-        id: get_output
-        run: |
-          for NAME in $(az webapp list --resource-group ${{ env.RESOURCE_GROUP_NAME }} --query "[].name" -o tsv); do
-            if [[ "$NAME" == app-* ]]; then
-              echo "WEBAPP_URL=https://${NAME}.azurewebsites.net" >> $GITHUB_OUTPUT
-            fi
-          done
 
       - name: Get AI Services name and store in variable
         if: always() && steps.check_create_rg.outcome == 'success'
