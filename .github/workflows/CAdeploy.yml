@@ -194,8 +194,8 @@ jobs:
 
           echo "Running post-deployment script..."
           bash ./infra/scripts/copy_kb_files.sh \
-            "${{ env.STORAGE_ACCOUNT_NAME }}" \
-            "${{ env.STORAGE_CONTAINER_NAME }}" \
+            "${{ env.STORAGE_ACCOUNT }}" \
+            "${{ env.STORAGE_CONTAINER }}" \
             "" \
             "${{ secrets.AZURE_CLIENT_ID }}"
           
