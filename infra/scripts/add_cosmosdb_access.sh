@@ -7,7 +7,7 @@ managedIdentityClientId="$3"
 
 # Authenticate with Azure
 if az account show &> /dev/null; then
-    echo "Already authenticated with Azure."
+    echo "Already authenticated with Azure. add_cosmosdb_access"
 else
     if [ -n "$managedIdentityClientId" ]; then
         # Use managed identity if running in Azure
@@ -31,6 +31,8 @@ if [ $? -ne 0 ]; then
         signed_user_id=$managedIdentityClientId
     fi
 fi
+
+echo "Signed in user ID: $signed_user_id"
 
 # Check if the user has the Cosmos DB Built-in Data Contributor role
 echo "Checking if user has the Cosmos DB Built-in Data Contributor role"

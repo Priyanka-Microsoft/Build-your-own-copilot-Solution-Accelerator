@@ -209,37 +209,6 @@ jobs:
                   "$COSMOS_DB_ACCOUNT_NAME" \
                   "${{ secrets.AZURE_CLIENT_ID }}" 
 
-                bash ./infra/scripts/copy_kb_files.sh \
-                  "$STORAGE_ACCOUNT_NAME" \
-                  "$STORAGE_CONTAINER_NAME" \
-                  "" \
-                  "${{ secrets.AZURE_CLIENT_ID }}"
-
-                bash ./infra/scripts/run_create_index_scripts.sh \
-                  "$KEY_VAULT_NAME" \
-                  "" \
-                  "${{ secrets.AZURE_CLIENT_ID }}" \
-                  "$RG_NAME" \
-                  "$SQL_SERVER_NAME"
-
-                user_roles_json='[
-                  {
-                    "clientId": "'"${{ secrets.AZURE_CLIENT_ID }}"'",
-                    "displayName": "webapp-identity",
-                    "role": "db_datareader"
-                  },
-                  {
-                    "clientId": "'"${{ secrets.AZURE_CLIENT_ID }}"'",
-                    "displayName": "webapp-identity",
-                    "role": "db_datawriter"
-                  }
-                ]'
-
-                bash ./infra/scripts/add_user_scripts/create_sql_user_and_role.sh \
-                  "$SQL_SERVER_NAME.database.windows.net" \
-                  "$SQL_DATABASE_NAME" \
-                  "$user_roles_json"
-
                 echo "=== Post-Deployment Script Completed Successfully ==="
       - name: Get App URLs
         id: get_output
