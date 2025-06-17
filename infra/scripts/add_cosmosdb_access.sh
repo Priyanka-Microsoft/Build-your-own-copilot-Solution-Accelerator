@@ -28,7 +28,8 @@ if [ $? -ne 0 ]; then
         echo "Error: Failed to get signed in user id."
         exit 1
     else
-        signed_user_id=$managedIdentityClientId
+        # signed_user_id=$managedIdentityClientId
+        signed_user_id=$(az ad sp show --id "$managedIdentityClientId" --query objectId -o tsv)
     fi
 fi
 
