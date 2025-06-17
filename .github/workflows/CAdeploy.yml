@@ -134,82 +134,73 @@ jobs:
           elif [[ "$BRANCH" == "demo" ]]; then TAG="demo"
           else TAG="default"; fi
           echo "tagname=$TAG" >> $GITHUB_OUTPUT
+      
+      - name: Get Deployment Output and extract Values
+        id: get_output
+        run: |
+          set -e
+          echo "Fetching deployment output..."
+          # Install azd (Azure Developer CLI) - required by process_sample_data.sh
+          curl -fsSL https://aka.ms/install-azd.sh | bash
+
+          DEPLOY_OUTPUT=$(az deployment group create \
+            --resource-group ${{ env.RESOURCE_GROUP_NAME }} \
+            --template-file infra/main.bicep \
+            --parameters AzureOpenAILocation=${{ env.AZURE_LOCATION }} environmentName=${{ env.SOLUTION_PREFIX }} cosmosLocation=eastus2 gptDeploymentCapacity=${{ env.GPT_MIN_CAPACITY }} embeddingDeploymentCapacity=${{ env.TEXT_EMBEDDING_MIN_CAPACITY }} \
+            --query "properties.outputs" -o json)
+
+          echo "Deployment output: $DEPLOY_OUTPUT"
+          if [[ -z "$DEPLOY_OUTPUT" ]]; then
+            echo "Error: Deployment output is empty. Please check the deployment logs."
+            exit 1
+          fi
+
+          export COSMOS_DB_ACCOUNT_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r '.cosmosdB_ACCOUNT_NAME.value')
+          echo "COSMOS_DB_ACCOUNT_NAME=$COSMOS_DB_ACCOUNT_NAME" >> $GITHUB_ENV
+          export STORAGE_ACCOUNT=$(echo "$DEPLOY_OUTPUT" | jq -r '.storagE_ACCOUNT_NAME.value')
+          echo "STORAGE_ACCOUNT=$STORAGE_ACCOUNT" >> $GITHUB_ENV
+          export STORAGE_CONTAINER=$(echo "$DEPLOY_OUTPUT" | jq -r '.storagE_CONTAINER_NAME.value')
+          echo "STORAGE_CONTAINER=$STORAGE_CONTAINER" >> $GITHUB_ENV
+          export KEYVAULT_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r '.keY_VAULT_NAME.value')
+          echo "KEYVAULT_NAME=$KEYVAULT_NAME" >> $GITHUB_ENV
+          export SQL_SERVER=$(echo "$DEPLOY_OUTPUT" | jq -r '.sqldB_SERVER.value')
+          echo "SQL_SERVER=$SQL_SERVER" >> $GITHUB_ENV
+          export SQL_DATABASE=$(echo "$DEPLOY_OUTPUT" | jq -r '.sqldB_DATABASE.value')
+          echo "SQL_DATABASE=$SQL_DATABASE" >> $GITHUB_ENV
+          export CLIENT_ID=$(echo "$DEPLOY_OUTPUT" | jq -r '.managedindentitY_WEBAPP_CLIENTID.value')
+          echo "CLIENT_ID=$CLIENT_ID" >> $GITHUB_ENV
+          export CLIENT_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r '.managedindentitY_WEBAPP_NAME.value')
+          echo "CLIENT_NAME=$CLIENT_NAME" >> $GITHUB_ENV
+          export RG_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r '.resourcE_GROUP_NAME.value')
+          echo "RG_NAME=$RG_NAME" >> $GITHUB_ENV
+          echo "Deployment output: $DEPLOY_OUTPUT"
+
+          # ✅ Resolve Managed Identity Object ID
+          export CLIENT_OBJECT_ID=$(az identity show \
+            --name "$CLIENT_NAME" \
+            --resource-group "$RG_NAME" \
+            --query 'principalId' -o tsv)
+
+          if [[ -z "$CLIENT_OBJECT_ID" ]]; then
+            echo "Error: Could not resolve object ID for managed identity '$CLIENT_NAME'"
+            exit 1
+          fi   
+          echo "CLIENT_OBJECT_ID=$CLIENT_OBJECT_ID" >> $GITHUB_ENV
 
       - name: Deploy Infra and Import Sample Data 
         run: |
-                set -e
+          set -e
+          az account set --subscription "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
 
-                # Install azd (Azure Developer CLI) - required by process_sample_data.sh
-                curl -fsSL https://aka.ms/install-azd.sh | bash
-
-                DEPLOY_OUTPUT=$(az deployment group create \
-                  --resource-group ${{ env.RESOURCE_GROUP_NAME }} \
-                  --template-file infra/main.bicep \
-                  --parameters AzureOpenAILocation=${{ env.AZURE_LOCATION }} environmentName=${{ env.SOLUTION_PREFIX }} cosmosLocation=eastus2 gptDeploymentCapacity=${{ env.GPT_MIN_CAPACITY }} embeddingDeploymentCapacity=${{ env.TEXT_EMBEDDING_MIN_CAPACITY }} \
-                  --query "properties.outputs" -o json)
-
-                echo "Deployment output: $DEPLOY_OUTPUT"
-                if [[ -z "$DEPLOY_OUTPUT" ]]; then
-                  echo "Error: Deployment output is empty. Please check the deployment logs."
-                  exit 1
-                fi
-
-                export COSMOS_DB_ACCOUNT_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r '.cosmosdB_ACCOUNT_NAME.value')
-                export STORAGE_ACCOUNT=$(echo "$DEPLOY_OUTPUT" | jq -r '.storagE_ACCOUNT_NAME.value')
-                export STORAGE_CONTAINER=$(echo "$DEPLOY_OUTPUT" | jq -r '.storagE_CONTAINER_NAME.value')
-                export KEYVAULT_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r '.keY_VAULT_NAME.value')
-                export SQL_SERVER=$(echo "$DEPLOY_OUTPUT" | jq -r '.sqldB_SERVER.value')
-                export SQL_DATABASE=$(echo "$DEPLOY_OUTPUT" | jq -r '.sqldB_DATABASE.value')
-                export CLIENT_ID=$(echo "$DEPLOY_OUTPUT" | jq -r '.managedindentitY_WEBAPP_CLIENTID.value')
-                export CLIENT_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r '.managedindentitY_WEBAPP_NAME.value')
-                export RG_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r '.resourcE_GROUP_NAME.value')
-
-                az account set --subscription "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
-
-                # ✅ Resolve Managed Identity Object ID
-                export CLIENT_OBJECT_ID=$(az identity show \
-                  --name "$CLIENT_NAME" \
-                  --resource-group "$RG_NAME" \
-                  --query 'principalId' -o tsv)
-
-                if [[ -z "$CLIENT_OBJECT_ID" ]]; then
-                  echo "Error: Could not resolve object ID for managed identity '$CLIENT_NAME'"
-                  exit 1
-                fi
-
-                # Save to GitHub Actions environment
-                echo "COSMOS_DB_ACCOUNT_NAME=$COSMOS_DB_ACCOUNT_NAME" >> $GITHUB_ENV
-                echo "STORAGE_ACCOUNT=$STORAGE_ACCOUNT" >> $GITHUB_ENV
-                echo "STORAGE_CONTAINER=$STORAGE_CONTAINER" >> $GITHUB_ENV
-                echo "KEYVAULT_NAME=$KEYVAULT_NAME" >> $GITHUB_ENV
-                echo "SQL_SERVER=$SQL_SERVER" >> $GITHUB_ENV
-                echo "SQL_DATABASE=$SQL_DATABASE" >> $GITHUB_ENV
-                echo "CLIENT_ID=$CLIENT_ID" >> $GITHUB_ENV
-                echo "CLIENT_NAME=$CLIENT_NAME" >> $GITHUB_ENV
-                echo "RG_NAME=$RG_NAME" >> $GITHUB_ENV
-                echo "CLIENT_OBJECT_ID=$CLIENT_OBJECT_ID" >> $GITHUB_ENV
-
-                echo "Executing command:"
-                echo "  \"$RG_NAME\" \\"
-                echo "  \"$COSMOS_DB_ACCOUNT_NAME\" \\"
-                echo "  \"$STORAGE_ACCOUNT\" \\"
-                echo "  \"$STORAGE_CONTAINER\" \\"
-                echo "  \"$KEYVAULT_NAME\" \\"
-                echo "  \"$SQL_SERVER\" \\"
-                echo "  \"$SQL_DATABASE\" \\"
-                echo "  \"$CLIENT_OBJECT_ID\" \\"
-                echo "  \"$CLIENT_NAME\""
-                echo ""
-
-                echo "Running post-deployment script..."
-                echo "Running post-deployment script..."
-
-                bash ./infra/scripts/add_cosmosdb_access.sh \
-                  "$RG_NAME" \
-                  "$COSMOS_DB_ACCOUNT_NAME" \
-                  "${{ secrets.AZURE_CLIENT_ID }}" 
-
-                echo "=== Post-Deployment Script Completed Successfully ==="
+          echo "Running post-deployment script..."
+          bash ./infra/scripts/copy_kb_files.sh \
+            "${{ env.STORAGE_ACCOUNT_NAME }}" \
+            "${{ env.STORAGE_CONTAINER_NAME }}" \
+            "" \
+            "${{ secrets.AZURE_CLIENT_ID }}"
+          
+          echo "=== Post-Deployment Script Completed Successfully ==="
+          
       - name: Get App URLs
         id: get_output
         run: |
