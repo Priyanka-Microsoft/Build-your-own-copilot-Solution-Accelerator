@@ -78,6 +78,7 @@ if [ -n "$admin" ]; then
     echo "User is already Azure SQL Server Admin"
 else
     echo "User is not Azure SQL Server Admin. Assigning the role."
+    echo "signedin user: $signed_user_display_name"
     MSYS_NO_PATHCONV=1 az sql server ad-admin create --display-name "$signed_user_display_name" --object-id $signed_user_id --resource-group $resourceGroupName --server $sqlServerName --output none
     if [ $? -eq 0 ]; then
         echo "Assigned user as Azure SQL Server Admin."
