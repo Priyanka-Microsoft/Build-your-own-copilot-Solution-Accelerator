@@ -57,6 +57,7 @@ if [ -z "$role_assignment" ]; then
             role_assignment_check=$(MSYS_NO_PATHCONV=1 az role assignment list --assignee $signed_user_id --role "Storage Blob Data Contributor" --scope $storage_account_resource_id --query "[].roleDefinitionId" -o tsv)
             if [ -n "$role_assignment_check" ]; then
                 echo "Role assignment verified successfully."
+                sleep 60
                 break
             else
                 echo "Role assignment not found, retrying..."
