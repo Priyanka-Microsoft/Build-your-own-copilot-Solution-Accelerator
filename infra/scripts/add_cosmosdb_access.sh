@@ -29,6 +29,8 @@ if [ $? -ne 0 ]; then
         exit 1
     else
         signed_user_id=$managedIdentityClientId
+        signed_user_id=$(az ad sp show --id 525c4012-5fba-4740-b992-f2ff6f34d087 --query id -o tsv)
+
     fi
 fi
 
