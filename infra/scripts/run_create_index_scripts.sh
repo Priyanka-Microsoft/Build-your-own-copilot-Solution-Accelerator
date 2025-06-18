@@ -97,7 +97,7 @@ fi
 # apk add python3 python3-dev g++ unixodbc-dev unixodbc libpq-dev
  
 # # RUN apt-get install python3 python3-dev g++ unixodbc-dev unixodbc libpq-dev
-# pip install pyodbc
+pip install pyodbc
 
 pythonScriptPath="infra/scripts/index_scripts/"
 
