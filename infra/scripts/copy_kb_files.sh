@@ -94,7 +94,7 @@ extractionPath1=""
 extractionPath2=""
 
 # Check if running in Azure Container App
-if !([ -z "$baseUrl" ] && [ -z "$managedIdentityClientId" ]); then
+if [ -n "$baseUrl" ] && [ -n "$managedIdentityClientId" ]; then
     extractionPath1="/mnt/azscripts/azscriptinput/$extractedFolder1"
     extractionPath2="/mnt/azscripts/azscriptinput/$extractedFolder2"
 
