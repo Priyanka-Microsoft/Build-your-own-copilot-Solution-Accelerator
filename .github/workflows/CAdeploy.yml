@@ -175,18 +175,6 @@ jobs:
           echo "RG_NAME=$RG_NAME" >> $GITHUB_ENV
           echo "Deployment output: $DEPLOY_OUTPUT"
 
-          # ✅ Resolve Managed Identity Object ID
-          export CLIENT_OBJECT_ID=$(az identity show \
-            --name "$CLIENT_NAME" \
-            --resource-group "$RG_NAME" \
-            --query 'principalId' -o tsv)
-
-          if [[ -z "$CLIENT_OBJECT_ID" ]]; then
-            echo "Error: Could not resolve object ID for managed identity '$CLIENT_NAME'"
-            exit 1
-          fi   
-          echo "CLIENT_OBJECT_ID=$CLIENT_OBJECT_ID" >> $GITHUB_ENV
-
       - name: Deploy Infra and Import Sample Data 
         run: |
           set -e
