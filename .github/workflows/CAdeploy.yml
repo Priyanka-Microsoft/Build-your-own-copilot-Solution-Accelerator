@@ -191,6 +191,10 @@ jobs:
           az account set --subscription "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
 
           echo "Running post-deployment script..."
+          bash ./infra/scripts/add_cosmosdb_access.sh \
+            "${{ env.RG_NAME }}" \
+            "${{ env.COSMOS_DB_ACCOUNT_NAME }}" \
+            "${{ secrets.AZURE_CLIENT_ID }}"
           bash ./infra/scripts/copy_kb_files.sh \
             "${{ env.STORAGE_ACCOUNT }}" \
             "${{ env.STORAGE_CONTAINER }}" \
