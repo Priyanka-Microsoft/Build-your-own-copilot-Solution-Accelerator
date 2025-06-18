@@ -181,6 +181,8 @@ jobs:
           echo "CLIENT_NAME=$CLIENT_NAME" >> $GITHUB_ENV
           export RG_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r '.resourcE_GROUP_NAME.value')
           echo "RG_NAME=$RG_NAME" >> $GITHUB_ENV
+          WEBAPP_URL=$(echo $DEPLOY_OUTPUT | jq -r '.weB_APP_URL.value')
+          echo "WEBAPP_URL=$WEBAPP_URL" >> $GITHUB_OUTPUT
           echo "Deployment output: $DEPLOY_OUTPUT"
 
       - name: Deploy Infra and Import Sample Data 
