@@ -102,7 +102,7 @@ fi
 pythonScriptPath="infra/scripts/index_scripts/"
 
 # Check if running in Azure Container App
-if !([ -z "$baseUrl" ] && [ -z "$managedIdentityClientId" ]); then
+if [ -n "$baseUrl" ] && [ -n "$managedIdentityClientId" ]; then
     requirementFile="requirements.txt"
     requirementFileUrl=${baseUrl}${pythonScriptPath}"requirements.txt"
 
