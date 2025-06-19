@@ -6,6 +6,8 @@ SqlDatabaseName="$2"
 UserRoleJSONArray="$3"
 ManagedIdentityClientId="$4"
 
+echo "Script Started"
+
 # Function to check if a command exists or runs successfully
 function check_command() {
     if ! eval "$1" &> /dev/null; then

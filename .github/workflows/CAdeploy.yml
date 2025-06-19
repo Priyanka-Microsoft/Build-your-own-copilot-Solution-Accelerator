@@ -233,6 +233,11 @@ jobs:
             }
           ]"
 
+          user_roles_json='[
+            {"clientId":"${{ env.CLIENT_ID }}","displayName":"${{ env.CLIENT_NAME }}","role":"db_datareader"},
+            {"clientId":"${{ env.CLIENT_ID }}","displayName":"${{ env.CLIENT_NAME }}","role":"db_owner"}
+          ]'
+
           bash ./infra/scripts/add_user_scripts/create_sql_user_and_role.sh \
             "${{ env.SQL_SERVER }}.database.windows.net" \
             "${{ env.SQL_DATABASE }}" \
