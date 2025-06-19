@@ -50,7 +50,10 @@ fi
 SQL_QUERY=""
 #loop through the JSON array and create users and assign roles using grep and sed
 count=1
+echo "Processing UserRoleJSONArray: $UserRoleJSONArray"
 while read -r json_object; do
+
+    echo "Processing JSON object: $json_object"
     # Extract fields from the JSON object using grep and sed
     clientId=$(echo "$json_object" | grep -o '"clientId": *"[^"]*"' | sed 's/"clientId": *"\([^"]*\)"/\1/')
     displayName=$(echo "$json_object" | grep -o '"displayName": *"[^"]*"' | sed 's/"displayName": *"\([^"]*\)"/\1/')
