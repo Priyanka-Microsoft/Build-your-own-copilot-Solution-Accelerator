@@ -446,3 +446,4 @@ resource aiDeveloperAccessProj 'Microsoft.Authorization/roleAssignments@2022-04-
 }
 
 output webAppUrl string = 'https://${WebsiteName}.azurewebsites.net'
+output webAppName string = WebsiteName

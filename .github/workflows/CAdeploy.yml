@@ -183,8 +183,8 @@ jobs:
           echo "RG_NAME=$RG_NAME" >> $GITHUB_ENV
           WEBAPP_URL=$(echo $DEPLOY_OUTPUT | jq -r '.weB_APP_URL.value')
           echo "WEBAPP_URL=$WEBAPP_URL" >> $GITHUB_OUTPUT
-          APP_SERVICE_NAME=$(echo $DEPLOY_OUTPUT | jq -r '.apP_SERVICE_NAME.value')
-          echo "APP_SERVICE_NAME=$APP_SERVICE_NAME" >> $GITHUB_OUTPUT
+          WEB_APP_NAME=$(echo $DEPLOY_OUTPUT | jq -r '.weB_APP_NAME.value')
+          echo "WEB_APP_NAME=$WEB_APP_NAME" >> $GITHUB_OUTPUT
           echo "Deployment output: $DEPLOY_OUTPUT"
 
           export CLIENT_OBJECT_ID=$(az identity show \
@@ -252,12 +252,12 @@ jobs:
         run: |
           az webapp auth update \
             --resource-group ${{ env.RG_NAME }} \
-            --name ${{ env.APP_SERVICE_NAME }} \
+            --name ${{ env.WEB_APP_NAME }} \
             --enabled true
 
           az webapp auth microsoft update \
             --resource-group ${{ env.RG_NAME }} \
-            --name ${{ env.APP_SERVICE_NAME }} \
+            --name ${{ env.WEB_APP_NAME }} \
             --client-id ${{ secrets.AZURE_CLIENT_ID }} \
             --issuer "https://sts.windows.net/${{ secrets.AZURE_TENANT_ID }}/"
 
