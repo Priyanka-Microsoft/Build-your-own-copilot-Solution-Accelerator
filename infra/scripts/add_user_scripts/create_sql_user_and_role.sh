@@ -4,7 +4,7 @@
 SqlServerName="$1"
 SqlDatabaseName="$2"
 UserRoleJSONArray="$3"
-ManagedIdentityClientId="$6"
+ManagedIdentityClientId="$4"
 
 # Function to check if a command exists or runs successfully
 function check_command() {
