@@ -34,19 +34,6 @@ else
     echo "Not authenticated with Azure. Attempting to authenticate..."
 fi
 
-echo "Getting signed in user id"
-signed_user_id=$(az ad signed-in-user show --query id -o tsv)
-if [ $? -ne 0 ]; then
-    if [ -z "$managedIdentityClientId" ]; then
-        echo "Error: Failed to get signed in user id."
-        exit 1
-    else
-        signed_user_id=$managedIdentityClientId
-        # signed_user_id=$(az ad sp show --id $managedIdentityClientId --query id -o tsv)
-
-    fi
-fi
-
 SQL_QUERY=""
 #loop through the JSON array and create users and assign roles using grep and sed
 count=1
