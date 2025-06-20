@@ -357,9 +357,6 @@ resource Website 'Microsoft.Web/sites@2020-06-01' = {
         {name: 'AZURE_COSMOSDB_ENABLE_FEEDBACK'
           value: AZURE_COSMOSDB_ENABLE_FEEDBACK
         }
-        {name: 'AUTH_ENABLED'
-        value: 'false'
-        }
         {
           name: 'SQLDB_USER_MID'
           value: userassignedIdentityClientId
@@ -447,4 +444,4 @@ resource aiDeveloperAccessProj 'Microsoft.Authorization/roleAssignments@2022-04-
 
 output webAppUrl string = 'https://${WebsiteName}.azurewebsites.net'
 output webAppName string = WebsiteName
-// output authEnabled bool = false
+
