@@ -263,3 +263,4 @@ output SQLDB_DATABASE string = sqlDBModule.outputs.sqlDbName
 output MANAGEDINDENTITY_WEBAPP_NAME string = managedIdentityModule.outputs.managedIdentityWebAppOutput.name
 output MANAGEDINDENTITY_WEBAPP_CLIENTID string = managedIdentityModule.outputs.managedIdentityWebAppOutput.clientId
 output WEB_APP_NAME string = appserviceModule.outputs.webAppName
+output AUTH_ENABLED bool = appserviceModule.outputs.authEnabled
