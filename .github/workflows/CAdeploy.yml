@@ -254,10 +254,7 @@ jobs:
           az webapp auth-classic update \
             --resource-group ${{ env.RG_NAME }} \
             --name ${{ env.WEB_APP_NAME }} \
-            --enabled true \
-            --action LoginWithAzureActiveDirectory \
-            --aad-client-id ${{ secrets.AZURE_CLIENT_ID }} \
-            --aad-token-issuer-url "https://sts.windows.net/${{ secrets.AZURE_TENANT_ID }}"
+            --enabled false
             
 
       - name: Get AI Services name and store in variable
