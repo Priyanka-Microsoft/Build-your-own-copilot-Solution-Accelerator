@@ -250,16 +250,15 @@ jobs:
       
       - name: Enable App Service Authentication
         run: |
-          az webapp auth update \
-            --resource-group ${{ env.RG_NAME }} \
-            --name ${{ env.WEB_APP_NAME }} \
-            --enabled true
 
-          az webapp auth microsoft update \
+          az webapp auth-classic update \
             --resource-group ${{ env.RG_NAME }} \
             --name ${{ env.WEB_APP_NAME }} \
-            --client-id ${{ secrets.AZURE_CLIENT_ID }} \
-            --issuer "https://sts.windows.net/${{ secrets.AZURE_TENANT_ID }}/"
+            --enabled true \
+            --action LoginWithAzureActiveDirectory \
+            --aad-client-id ${{ secrets.AZURE_CLIENT_ID }} \
+            --aad-token-issuer-url "https://sts.windows.net/${{ secrets.AZURE_TENANT_ID }}"
+            
 
       - name: Get AI Services name and store in variable
         if: always() && steps.check_create_rg.outcome == 'success'
