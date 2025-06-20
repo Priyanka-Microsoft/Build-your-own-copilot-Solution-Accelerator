@@ -52,7 +52,6 @@ fi
 SQL_QUERY=""
 #loop through the JSON array and create users and assign roles using grep and sed
 count=1
-echo "Processing UserRoleJSONArray: $UserRoleJSONArray"
 while read -r json_object; do
 
     echo "Processing JSON object: $json_object"
@@ -61,8 +60,6 @@ while read -r json_object; do
     displayName=$(echo "$json_object" | grep -o '"displayName": *"[^"]*"' | sed 's/"displayName": *"\([^"]*\)"/\1/')
     role=$(echo "$json_object" | grep -o '"role": *"[^"]*"' | sed 's/"role": *"\([^"]*\)"/\1/')
 
-    echo "Processing user $count: $displayName with role $role"
-    echo "Client ID: $clientId"
     # Append to SQL_QUERY with dynamic variable names
     SQL_QUERY+="
     DECLARE @username$count nvarchar(max) = N'$displayName';

@@ -147,6 +147,8 @@ param AZURE_COSMOSDB_ENABLE_FEEDBACK string = 'True'
 
 param imageTag string
 
+param authEnabled bool
+
 param userassignedIdentityId string
 param userassignedIdentityClientId string
 param applicationInsightsId string
@@ -358,7 +360,7 @@ resource Website 'Microsoft.Web/sites@2020-06-01' = {
           value: AZURE_COSMOSDB_ENABLE_FEEDBACK
         }
         {name: 'AUTH_ENABLED'
-        value: 'false'
+        value: authEnabled
         }
         {
           name: 'SQLDB_USER_MID'
@@ -447,4 +449,4 @@ resource aiDeveloperAccessProj 'Microsoft.Authorization/roleAssignments@2022-04-
 
 output webAppUrl string = 'https://${WebsiteName}.azurewebsites.net'
 output webAppName string = WebsiteName
-output authEnabled bool = false
+output authEnabled bool = authEnabled

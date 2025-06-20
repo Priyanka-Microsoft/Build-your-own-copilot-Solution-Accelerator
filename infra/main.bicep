@@ -35,6 +35,8 @@ param azureOpenaiAPIVersion string = '2025-01-01-preview'
 // https://learn.microsoft.com/en-us/azure/ai-services/openai/quotas-limits
 param gptDeploymentCapacity int = 30
 
+param authEnabled bool = true
+
 @minLength(1)
 @description('Name of the Text Embedding model to deploy:')
 @allowed([
@@ -65,6 +67,8 @@ var solutionPrefix = 'ca${padLeft(take(uniqueId, 12), 12, '0')}'
 
 // Load the abbrevations file required to name the azure resources.
 var abbrs = loadJsonContent('./abbreviations.json')
+
+
 
 //var resourceGroupLocation = resourceGroup().location
 //var solutionLocation = resourceGroupLocation
@@ -196,6 +200,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
 module appserviceModule 'deploy_app_service.bicep' = {
   name: 'deploy_app_service'
   params: {
+    authEnabled: authEnabled
     solutionLocation: solutionLocation
     HostingPlanName: '${abbrs.compute.appServicePlan}${solutionPrefix}'
     WebsiteName: '${abbrs.compute.webApp}${solutionPrefix}'
