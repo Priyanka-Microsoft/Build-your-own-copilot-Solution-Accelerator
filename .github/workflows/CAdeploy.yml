@@ -221,19 +221,7 @@ jobs:
             "" \
             "${{ secrets.AZURE_CLIENT_ID }}" \
             "${{ env.RG_NAME }}" \
-            "${{ env.SQL_SERVER }}" \
-          user_roles_json="[
-            {
-              \"clientId\": \"${{ env.CLIENT_ID }}\",
-              \"displayName\": \"${{ env.CLIENT_NAME }}\",
-              \"role\": \"db_datareader\"
-            },
-            {
-              \"clientId\": \"${{ env.CLIENT_ID }}\",
-              \"displayName\": \"${{ env.CLIENT_NAME }}\",
-              \"role\": \"db_datawriter\"
-            }
-          ]"
+            "${{ env.SQL_SERVER }}"
 
           user_roles_json='[
             {"clientId":"${{ env.CLIENT_ID }}","displayName":"${{ env.CLIENT_NAME }}","role":"db_datareader"},
