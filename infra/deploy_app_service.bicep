@@ -147,7 +147,7 @@ param AZURE_COSMOSDB_ENABLE_FEEDBACK string = 'True'
 
 param imageTag string
 
-param authEnabled string
+param authEnabled bool
 param userassignedIdentityId string
 param userassignedIdentityClientId string
 param applicationInsightsId string
