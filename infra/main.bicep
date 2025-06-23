@@ -66,6 +66,7 @@ var solutionPrefix = 'ca${padLeft(take(uniqueId, 12), 12, '0')}'
 // Load the abbrevations file required to name the azure resources.
 var abbrs = loadJsonContent('./abbreviations.json')
 
+param authEnabled bool = true
 //var resourceGroupLocation = resourceGroup().location
 //var solutionLocation = resourceGroupLocation
 // var baseUrl = 'https://raw.githubusercontent.com/microsoft/Build-your-own-copilot-Solution-Accelerator/main/'
@@ -196,6 +197,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
 module appserviceModule 'deploy_app_service.bicep' = {
   name: 'deploy_app_service'
   params: {
+    authEnabled:authEnabled
     solutionLocation: solutionLocation
     HostingPlanName: '${abbrs.compute.appServicePlan}${solutionPrefix}'
     WebsiteName: '${abbrs.compute.webApp}${solutionPrefix}'
@@ -263,3 +265,4 @@ output SQLDB_DATABASE string = sqlDBModule.outputs.sqlDbName
 output MANAGEDINDENTITY_WEBAPP_NAME string = managedIdentityModule.outputs.managedIdentityWebAppOutput.name
 output MANAGEDINDENTITY_WEBAPP_CLIENTID string = managedIdentityModule.outputs.managedIdentityWebAppOutput.clientId
 output WEB_APP_NAME string = appserviceModule.outputs.webAppName
+output AuthEnabled bool = appserviceModule.outputs.authEnabled
