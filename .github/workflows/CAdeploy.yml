@@ -187,11 +187,11 @@ jobs:
           echo "WEBAPP_URL=$WEBAPP_URL" >> $GITHUB_OUTPUT
           WEB_APP_NAME=$(echo $DEPLOY_OUTPUT | jq -r '.weB_APP_NAME.value')
           echo "WEB_APP_NAME=$WEB_APP_NAME" >> $GITHUB_ENV
-          AUTH_ENABLED=$(echo $DEPLOY_OUTPUT | jq -r '.autH_ENABLED.value')
-          echo "AUTH_ENABLED=$AUTH_ENABLED" >> $GITHUB_ENV
           echo "Deployment output: $DEPLOY_OUTPUT"
 
-          az webapp config appsettings set -g $RG_NAME -n $WEB_APP_NAME --settings AUTH_ENABLED=false
+
+          echo "🔧 Disabling AUTH_ENABLED for the web app..."
+          az webapp config appsettings set -g "$RG_NAME" -n "$WEB_APP_NAME" --settings AUTH_ENABLED=false
 
           export CLIENT_OBJECT_ID=$(az identity show \
                   --name "$CLIENT_NAME" \
