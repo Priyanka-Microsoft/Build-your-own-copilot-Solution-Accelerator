@@ -35,6 +35,8 @@ param azureOpenaiAPIVersion string = '2025-01-01-preview'
 // https://learn.microsoft.com/en-us/azure/ai-services/openai/quotas-limits
 param gptDeploymentCapacity int = 30
 
+param authEnabled bool = true
+
 @minLength(1)
 @description('Name of the Text Embedding model to deploy:')
 @allowed([
@@ -198,6 +200,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
 module appserviceModule 'deploy_app_service.bicep' = {
   name: 'deploy_app_service'
   params: {
+    authEnabled: authEnabled
     solutionLocation: solutionLocation
     HostingPlanName: '${abbrs.compute.appServicePlan}${solutionPrefix}'
     WebsiteName: '${abbrs.compute.webApp}${solutionPrefix}'
@@ -265,4 +268,4 @@ output SQLDB_DATABASE string = sqlDBModule.outputs.sqlDbName
 output MANAGEDINDENTITY_WEBAPP_NAME string = managedIdentityModule.outputs.managedIdentityWebAppOutput.name
 output MANAGEDINDENTITY_WEBAPP_CLIENTID string = managedIdentityModule.outputs.managedIdentityWebAppOutput.clientId
 output WEB_APP_NAME string = appserviceModule.outputs.webAppName
-
+output AUTH_ENABLED bool = appserviceModule.outputs.authEnabled
