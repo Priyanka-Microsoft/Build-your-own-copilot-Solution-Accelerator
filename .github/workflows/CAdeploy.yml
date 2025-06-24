@@ -219,9 +219,10 @@ jobs:
             --principal-id "${{ env.CLIENT_OBJECT_ID }}"
           
           az role assignment create \
-          --assignee ${{ env.CLIENT_OBJECT_ID }} \
-          --role "Cognitive Services OpenAI User" \
-          --scope /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}}}/providers/Microsoft.CognitiveServices/accounts/${{ env.AI_FOUNDARY_NAME }}
+            --assignee-object-id ${{ env.CLIENT_OBJECT_ID }} \
+            --assignee-principal-type ServicePrincipal \
+            --role "Cognitive Services OpenAI User" \
+            --scope /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}}}/providers/Microsoft.CognitiveServices/accounts/${{ env.AI_FOUNDARY_NAME }}
 
 
           echo "Running post-deployment script..."
