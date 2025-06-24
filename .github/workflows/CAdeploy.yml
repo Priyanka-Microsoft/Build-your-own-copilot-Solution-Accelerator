@@ -167,6 +167,8 @@ jobs:
 
           export AI_FOUNDARY_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r '.aI_FOUNDRY_NAME.value')
           echo "AI_FOUNDARY_NAME=$AI_FOUNDARY_NAME" >> $GITHUB_ENV
+          export SEARCH_SERVICE_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r '.aI_SEARCH_SERVICE_NAME.value')
+          echo "SEARCH_SERVICE_NAME=$SEARCH_SERVICE_NAME" >> $GITHUB_ENV
           export COSMOS_DB_ACCOUNT_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r '.cosmosdB_ACCOUNT_NAME.value')
           echo "COSMOS_DB_ACCOUNT_NAME=$COSMOS_DB_ACCOUNT_NAME" >> $GITHUB_ENV
           export STORAGE_ACCOUNT=$(echo "$DEPLOY_OUTPUT" | jq -r '.storagE_ACCOUNT_NAME.value')
@@ -212,13 +214,17 @@ jobs:
           
           export AZURE_CLIENT_OBJECT_ID=$(az ad sp show --id ${{ secrets.AZURE_CLIENT_ID }} --query id -o tsv)
           echo "AZURE_CLIENT_OBJECT_ID=$AZURE_CLIENT_OBJECT_ID" >> $GITHUB_ENV
+
+          az role assignment create \
+            --assignee-object-id $AZURE_CLIENT_OBJECT_ID \
+            --role "Search Index Data Contributor" \
+            --scope /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}/providers/Microsoft.Search/searchServices/<SEARCH_SERVICE_NAME>
           
           az role assignment create \
             --assignee-object-id $AZURE_CLIENT_OBJECT_ID \
             --assignee-principal-type ServicePrincipal \
             --role "Cognitive Services OpenAI User" \
-            --scope /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}/providers/Microsoft.CognitiveServices/accounts/${{ env.AI_FOUNDARY_NAME }}
-
+            --scope /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}/providers/Microsoft.CognitiveServices/accounts/${{ env.SEARCH_SERVICE_NAME }}
 
           echo "Running post-deployment script..."
           bash ./infra/scripts/add_cosmosdb_access.sh \
