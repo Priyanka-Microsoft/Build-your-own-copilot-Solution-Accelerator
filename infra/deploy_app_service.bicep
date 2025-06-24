@@ -432,3 +432,4 @@ resource aiUserRoleAssignmentFoundryProject 'Microsoft.Authorization/roleAssignm
 }
 
 output webAppUrl string = 'https://${WebsiteName}.azurewebsites.net'
+output webAppName string = WebsiteName
