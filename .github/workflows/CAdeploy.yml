@@ -165,6 +165,8 @@ jobs:
             exit 1
           fi
 
+          export AI_FOUNDARY_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r '.aI_FOUNDRY_NAME.value')
+          echo "AI_FOUNDARY_NAME=$AI_FOUNDARY_NAME" >> $GITHUB_ENV
           export COSMOS_DB_ACCOUNT_NAME=$(echo "$DEPLOY_OUTPUT" | jq -r '.cosmosdB_ACCOUNT_NAME.value')
           echo "COSMOS_DB_ACCOUNT_NAME=$COSMOS_DB_ACCOUNT_NAME" >> $GITHUB_ENV
           export STORAGE_ACCOUNT=$(echo "$DEPLOY_OUTPUT" | jq -r '.storagE_ACCOUNT_NAME.value')
@@ -201,6 +203,8 @@ jobs:
                   --query 'principalId' -o tsv)
           echo "CLIENT_OBJECT_ID=$CLIENT_OBJECT_ID" >> $GITHUB_ENV
 
+
+
       - name: Deploy Infra and Import Sample Data 
         run: |
           set -e
@@ -213,6 +217,12 @@ jobs:
             --role-definition-name "Cosmos DB Built-in Data Contributor" \
             --scope "/" \
             --principal-id "${{ env.CLIENT_OBJECT_ID }}"
+          
+          az role assignment create \
+          --assignee ${{ env.CLIENT_OBJECT_ID }} \
+          --role "Cognitive Services OpenAI User" \
+          --scope /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}}}/providers/Microsoft.CognitiveServices/accounts/${{ env.AI_FOUNDARY_NAME }}
+
 
           echo "Running post-deployment script..."
           bash ./infra/scripts/add_cosmosdb_access.sh \
