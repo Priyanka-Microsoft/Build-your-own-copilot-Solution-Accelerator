@@ -209,17 +209,12 @@ jobs:
         run: |
           set -e
           az account set --subscription "${{ secrets.AZURE_SUBSCRIPTION_ID }}"
-
-          # Fixed Cosmos DB role assignment - using correct variable names
-          az cosmosdb sql role assignment create \
-            --account-name "${{ env.COSMOS_DB_ACCOUNT_NAME }}" \
-            --resource-group "${{ env.RG_NAME }}" \
-            --role-definition-name "Cosmos DB Built-in Data Contributor" \
-            --scope "/" \
-            --principal-id "${{ env.CLIENT_OBJECT_ID }}"
+          
+          AZURE_CLIENT_OBJECT_ID = $(az ad sp show --id ${{ secrets.AZURE_CLIENT_ID }} --query id -o tsv)
+          echo "AZURE_CLIENT_OBJECT_ID=$AZURE_CLIENT_OBJECT_ID" >> $GITHUB_ENV
           
           az role assignment create \
-            --assignee-object-id ${{ env.CLIENT_OBJECT_ID }} \
+            --assignee-object-id ${{ env.AZURE_CLIENT_OBJECT_ID }} \
             --assignee-principal-type ServicePrincipal \
             --role "Cognitive Services OpenAI User" \
             --scope /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ env.RG_NAME }}/providers/Microsoft.CognitiveServices/accounts/${{ env.AI_FOUNDARY_NAME }}
