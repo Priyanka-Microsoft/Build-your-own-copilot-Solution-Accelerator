@@ -2,10 +2,16 @@ name: Validate Deployment - Researcher
 
 on:
   push:
-    branches:
-      - byoc-researcher
-  schedule:
-    - cron: '0 7,19 * * *'  # Runs at 7:00 AM and 7:00 PM GMT
+    branches: [byoc-researcher]
+  pull_request:
+    branches: [byoc-researcher]
+    types:
+      - opened
+      - ready_for_review
+      - reopened
+      - synchronize
+  merge_group:
+  workflow_dispatch:
 
 jobs:
   deploy:

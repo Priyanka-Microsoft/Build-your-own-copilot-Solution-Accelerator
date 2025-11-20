@@ -32,7 +32,7 @@ echo "✅ Azure subscription set successfully."
 
 # Define models and their minimum required capacities
 declare -A MIN_CAPACITY=(
-    ["OpenAI.Standard.gpt-4.1-mini"]=$GPT_MIN_CAPACITY
+    ["OpenAI.GlobalStandard.gpt4.1-mini"]=$GPT_MIN_CAPACITY
     ["OpenAI.GlobalStandard.text-embedding-ada-002"]=$TEXT_EMBEDDING_MIN_CAPACITY
 )
 
@@ -53,6 +53,12 @@ for REGION in "${REGIONS[@]}"; do
             BEGIN { RS="},"; FS="," }
             $0 ~ model { print $0 }
         ')
+
+        echo "$QUOTA_INFO" | tr '[:upper:]' '[:lower:]'
+        echo "----------------------------------------"
+        echo "Quota Information for Model: $MODEL"
+        echo "$MODEL_INFO"
+
 
         if [ -z "$MODEL_INFO" ]; then
             echo "⚠️ WARNING: No quota information found for model: $MODEL in $REGION. Skipping."
