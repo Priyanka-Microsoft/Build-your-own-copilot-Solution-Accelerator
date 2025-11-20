@@ -54,6 +54,12 @@ for REGION in "${REGIONS[@]}"; do
             $0 ~ model { print $0 }
         ')
 
+        echo "$QUOTA_INFO" | tr '[:upper:]' '[:lower:]'
+        echo "----------------------------------------"
+        echo "Quota Information for Model: $MODEL"
+        echo "$MODEL_INFO"
+
+
         if [ -z "$MODEL_INFO" ]; then
             echo "⚠️ WARNING: No quota information found for model: $MODEL in $REGION. Skipping."
             INSUFFICIENT_QUOTA=true
